@@ -179,7 +179,7 @@ void parse_arguments(int argc, char* argv[])
 void show_author_info(void)
 {
     printf("=====================================\n");
-    printf("Text Analyzer v1.0\n");
+    printf("Text Analyzer\n");
     printf("Автор: Березин Евгений Андреевич\n");
     printf("Группа: ИТПМ-125\n");
     printf("Преподаватель: Мокряков Алексей Викторович\n");

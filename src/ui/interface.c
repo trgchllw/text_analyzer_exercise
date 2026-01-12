@@ -5,7 +5,7 @@
 // Вывод главного меню
 void show_main_menu(void)
 {
-    printf("\n=== Text File Analyzer ===\n");
+    printf("\n=== Text Analyzer ===\n");
     printf("1. Подсчет статистики файла\n");
     printf("2. Поиск слова в файле\n");
     printf("3. Выход\n");

@@ -19,12 +19,10 @@ TARGET = text_analyzer
 BUILD_DIR = build
 SRC_DIR = src
 
-# Модули
 CORE_DIR = $(SRC_DIR)/core
 UI_DIR = $(SRC_DIR)/ui
 UTILS_DIR = $(SRC_DIR)/utils
 
-# Файлы
 CORE_SRC = $(CORE_DIR)/analyzer.c
 UI_SRC = $(UI_DIR)/interface.c
 UTILS_SRC = $(UTILS_DIR)/logger.c
