@@ -1,0 +1,35 @@
+#!/bin/bash
+
+echo "=== Конфигурация Text Analyzer ==="
+
+read -p "Введите ваше ФИО: " USER_NAME
+
+while true; do
+    read -p "Введите ваш email: " USER_EMAIL
+    if [[ "$USER_EMAIL" =~ ^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$ ]]; then
+        echo "✓ Email корректен"
+        break
+    else
+        echo "✗ Неверный формат email. Попробуйте снова."
+    fi
+done
+
+while true; do
+    read -p "Введите ваш телефон (10-15 цифр): " USER_PHONE
+    if [[ "$USER_PHONE" =~ ^[0-9]{10,15}$ ]]; then
+        echo "✓ Телефон корректен"
+        break
+    else
+        echo "✗ Телефон должен содержать 10-15 цифр."
+    fi
+done
+
+cat > install.conf <<EOF
+USER_NAME="$USER_NAME"
+USER_EMAIL="$USER_EMAIL"
+USER_PHONE="$USER_PHONE"
+INSTALL_DATE="$(date +%Y-%m-%d_%H:%M:%S)"
+LICENSE="FREE_FOR_EDUCATIONAL_USE"
+EOF
+
+echo "✓ Сертификат создан: install.conf"

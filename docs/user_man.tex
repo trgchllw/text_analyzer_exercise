@@ -1,0 +1,161 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2cm,bottom=2cm}
+
+\title{\textbf{Руководство пользователя Text Analyzer v1.0}}
+\author{Студент группы ИТПМ-125 \\ Березин Евгений Андреевич}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Общие сведения}
+Text Analyzer — утилита для анализа текстовых файлов, разработанная в рамках курсовой работы по дисциплине «Программирование».
+
+\subsection{Возможности программы}
+\begin{itemize}
+    \item Подсчет количества строк, слов и символов в текстовом файле
+    \item Поиск заданного слова в файле с подсчетом вхождений
+    \item Ведение логов всех операций с временными метками
+\end{itemize}
+
+\section{Установка программы}
+
+\subsection{Требования}
+\begin{itemize}
+    \item Операционная система: Linux, macOS
+    \item Компилятор: GCC с поддержкой стандарта C99
+    \item Дисковое пространство: минимум 10 МБ
+\end{itemize}
+
+\subsection{Процедура установки}
+\begin{lstlisting}[language=bash,frame=single]
+# 1. Компиляция
+make compile
+
+# 2. Конфигурация (создание сертификата)
+make configure
+
+# 3. Установка в систему
+sudo make install
+\end{lstlisting}
+
+После установки программа доступна по команде \texttt{text\_analyzer}.
+
+\section{Использование программы}
+
+\subsection{Запуск в интерактивном режиме}
+Запустите программу без параметров или с аргументом \texttt{-m}:
+\begin{lstlisting}[language=bash,frame=single]
+./text_analyzer -m
+\end{lstlisting}
+
+Появится меню:
+\begin{verbatim}
+=== Text Analyzer ===
+1. Подсчет статистики файла
+2. Поиск слова в файле
+3. Выход
+Выберите действие (1-3):
+\end{verbatim}
+
+\subsection{Запуск в пакетном режиме}
+Для работы с конкретным файлом используйте аргументы:
+
+\subsubsection{Подсчет статистики}
+\begin{lstlisting}[language=bash,frame=single]
+./text_analyzer -f input.txt -o stats.txt
+\end{lstlisting}
+
+Результат будет сохранен в файл \texttt{stats.txt}.
+
+\subsubsection{Поиск слова}
+\begin{lstlisting}[language=bash,frame=single]
+./text_analyzer -f input.txt -w слово -o result.txt
+\end{lstlisting}
+
+\section{Аргументы командной строки}
+
+Можно указать следующие параметры:
+
+\begin{center}
+\begin{tabular}{|l|p{8cm}|}
+\hline
+\textbf{Аргумент} & \textbf{Описание} \\
+\hline
+\texttt{-C <файл>} & Использовать конфигурационный файл \\
+\hline
+\texttt{-d} & Режим отладки (детальное логирование) \\
+\hline
+\texttt{-f <файл>} & Входной файл для обработки \\
+\hline
+\texttt{-h} & Показать справку \\
+\hline
+\texttt{-i} & Показать информацию об авторе \\
+\hline
+\texttt{-o <файл>} & Сохранить результат в файл \\
+\hline
+\texttt{-S} & Тихий режим (без логов) \\
+\hline
+\texttt{-t} & Не удалять временные файлы \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Пример работы}
+
+\subsection{Интерактивное меню}
+\includegraphics[width=\textwidth]{screenshot_menu.png}
+
+\subsection{Пакетный режим}
+\includegraphics[width=\textwidth]{screenshot_batch.png}
+
+\section{Логирование}
+
+Программа ведет журнал операций в директории \texttt{/var/log/text\_analyzer/}.
+
+\subsection{Структура лога}
+\begin{lstlisting}[frame=single]
+[2025-12-19 16:30:22] user@example.com: count_stats = Stats: L=4 W=8 C=35 | Duration=0s | Code=0
+\end{lstlisting}
+
+\subsection{Анализ логов}
+Используйте \texttt{awk} для анализа:
+\begin{lstlisting}[language=bash,frame=single]
+# Количество запусков
+awk 'END {print NR}' /var/log/text_analyzer/*.log
+
+# Поиск ошибок
+awk '/ERROR/' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\section{Реакция на ошибки}
+
+Если указанный файл не найден, программа выводит:
+\begin{verbatim}
+Ошибка: не удалось открыть файл 'notfound.txt'
+\end{verbatim}
+Код завершения: \texttt{-1}. Логируется ошибка с кодом \texttt{ERROR\_FILE\_NOT\_FOUND}.
+
+\section{Состав модулей}
+
+\begin{itemize}
+    \item \texttt{core/analyzer.c} — ядро функций анализатора
+    \item \texttt{ui/interface.c} — пользовательский интерфейс
+    \item \texttt{utils/logger.c} — система логирования
+    \item \texttt{main.c} — главный модуль с парсером аргументов
+\end{itemize}
+
+\section{Контакты}
+
+\textbf{Автор:} Березин Евгений Андреевич \\
+\textbf{Email:} trgchllw@mail.ru \\
+\textbf{Группа:} ИТПМ-125 \\
+\textbf{Университет:} РГУ им. Косыгина
+
+\end{document}

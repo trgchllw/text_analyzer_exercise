@@ -1,0 +1,139 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{listings}
+\usepackage{geometry}
+\geometry{left=2.5cm,right=2.5cm,top=2cm,bottom=2cm}
+
+\title{\textbf{Инструкция по анализу логов Text Analyzer}}
+\author{Системный администратор}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Общие сведения}
+
+Лог-файлы программы Text Analyzer хранятся в директории \texttt{/var/log/text\_analyzer/} и содержат информацию о всех операциях пользователей.
+
+\section{Структура лога}
+
+Каждая запись в логе имеет формат:
+\begin{lstlisting}[frame=single]
+[YYYY-MM-DD HH:MM:SS] user_id: action = result | Duration=Nс | Code=X
+\end{lstlisting}
+
+Где:
+\begin{itemize}
+    \item \texttt{user\_id} — идентификатор пользователя
+    \item \texttt{action} — выполненное действие (например, count\_stats)
+    \item \texttt{Duration} — продолжительность операции в секундах
+    \item \texttt{Code} — код завершения (0 — успех, -1 — ошибка)
+\end{itemize}
+
+\section{Инструменты анализа}
+
+Для анализа используется утилита \texttt{awk} (требование п.3.П.11).
+
+\subsection{Подсчет общего количества запусков}
+\begin{lstlisting}[language=bash,frame=single]
+awk 'END {print "Всего запусков:", NR}' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\subsection{Подсчет запусков по дням}
+\begin{lstlisting}[language=bash,frame=single]
+awk -F'[_ ]' '{print $1}' /var/log/text_analyzer/*.log | sort | uniq -c
+\end{lstlisting}
+
+\subsection{Подсчет запусков по часам}
+\begin{lstlisting}[language=bash,frame=single]
+awk -F'[ :]' '{print $2}' /var/log/text_analyzer/*.log | sort | uniq -c
+\end{lstlisting}
+
+\subsection{Поиск всех ошибок}
+\begin{lstlisting}[language=bash,frame=single]
+awk '/Code=-1/' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\subsection{Статистика по обработанным файлам}
+\begin{lstlisting}[language=bash,frame=single]
+awk '/count_stats/ {stats++} END {print "Обработано файлов:", stats}' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\subsection{Поиск по временному диапазону}
+Анализ логов за конкретный день:
+\begin{lstlisting}[language=bash,frame=single]
+awk '/\[2025-12-19/' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\section{Примеры использования}
+
+\subsection{Ежедневный отчет}
+Скрипт для генерации отчета за сутки:
+\begin{lstlisting}[language=bash,frame=single]
+#!/bin/bash
+LOG_DIR="/var/log/text_analyzer"
+DATE=$(date +%Y-%m-%d)
+
+echo "=== Отчет за $DATE ==="
+echo "Запусков:"
+awk -v date="$DATE" '$0 ~ date' $LOG_DIR/*.log | wc -l
+
+echo "Ошибок:"
+awk -v date="$DATE" '$0 ~ date && /Code=-1/' $LOG_DIR/*.log | wc -l
+\end{lstlisting}
+
+\subsection{Мониторинг производительности}
+Подсчет средней продолжительности операций:
+\begin{lstlisting}[language=bash,frame=single]
+awk -F'Duration=|s ' '{sum+=$2; count++} END {print "Среднее время:", sum/count, "сек"}' /var/log/text_analyzer/*.log
+\end{lstlisting}
+
+\section{Форматы лог-файлов}
+
+\subsection{Именование файлов}
+Имена файлов формируются по шаблону:
+\begin{lstlisting}
+YYYY-MM-DD_HH-MM-SS.log
+\end{lstlisting}
+
+Где:
+\begin{itemize}
+    \item \texttt{YYYY} — год
+    \item \texttt{MM} — месяц
+    \item \texttt{DD} — день
+    \item \texttt{HH-MM-SS} — время создания
+\end{itemize}
+
+\subsection{Права доступа}
+Права на файлы логов: \texttt{0644} (чтение/запись владельцу, чтение остальным).
+
+\section{Хранение и ротация}
+
+Логи не удаляются автоматически. Для управления используйте системные утилиты:
+
+\begin{lstlisting}[language=bash,frame=single]
+# Сжать старые логи
+find /var/log/text_analyzer/ -name "*.log" -mtime +30 -exec gzip {} \;
+
+# Удалить логи старше 90 дней
+find /var/log/text_analyzer/ -name "*.log" -mtime +90 -delete
+\end{lstlisting}
+
+\section{Решение проблем}
+
+\subsection{Логи не создаются}
+\begin{enumerate}
+    \item Проверьте права на директорию: \texttt{ls -ld /var/log/text\_analyzer}
+    \item Убедитесь, что программа не запущена с ключом \texttt{-S} (тихий режим)
+    \item Проверьте доступ к диску: \texttt{df -h /var/log}
+\end{enumerate}
+
+\subsection{Поврежденные логи}
+Если лог поврежден, удалите его вручную:
+\begin{lstlisting}[language=bash,frame=single]
+sudo rm /var/log/text_analyzer/поврежденный_файл.log
+\end{lstlisting}
+
+\end{document}

@@ -1,0 +1,170 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage{graphicx}
+\geometry{left=2.5cm,right=2.5cm,top=2cm,bottom=2cm}
+
+\title{\textbf{Инструкция по установке Text Analyzer}}
+\author{Техническая документация}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Предварительные требования}
+
+Перед установкой убедитесь, что в системе установлены:
+
+\begin{itemize}
+    \item Компилятор GCC
+    \item Утилита Make
+    \item Система сборки LaTeX (опционально, для документации)
+\end{itemize}
+
+\subsection{Проверка наличия GCC}
+\begin{lstlisting}[language=bash,frame=single]
+gcc --version
+\end{lstlisting}
+
+\subsection{Проверка наличия Make}
+\begin{lstlisting}[language=bash,frame=single]
+make --version
+\end{lstlisting}
+
+\section{Сборка из исходников}
+
+\subsection{Шаг 1: Скачивание исходного кода}
+Скопируйте исходный код в директорию \texttt{text\_analyzer}.
+
+\subsection{Шаг 2: Компиляция}
+Перейдите в директорию проекта и выполните:
+\begin{lstlisting}[language=bash,frame=single]
+make compile
+\end{lstlisting}
+Результат: создание исполняемого файла \texttt{text\_analyzer}.
+
+\subsection{Шаг 3: Генерация документации}
+Если установлен LaTeX:
+\begin{lstlisting}[language=bash,frame=single]
+make docs
+\end{lstlisting}
+Результат: PDF файлы в директории \texttt{docs/}.
+
+\subsection{Шаг 4: Конфигурация}
+Создайте конфигурационный файл:
+\begin{lstlisting}[language=bash,frame=single]
+make configure
+\end{lstlisting}
+Скрипт запросит:
+\begin{itemize}
+    \item ФИО пользователя
+    \item Email (проверяется формат)
+    \item Телефон (проверяется формат, 10-15 цифр)
+\end{itemize}
+Результат: файл \texttt{install.conf} с сертификатом.
+
+\subsection{Шаг 5: Установка}
+Для установки в систему выполните:
+\begin{lstlisting}[language=bash,frame=single]
+sudo make install
+\end{lstlisting}
+В результате:
+\begin{itemize}
+    \item Программа копируется в \texttt{/usr/bin/text\_analyzer}
+    \item Создается символическая ссылка \texttt{/usr/bin/analyzer}
+    \item Сертификат копируется в \texttt{/etc/text\_analyzer/install.conf}
+    \item Создается директория для логов \texttt{/var/log/text\_analyzer}
+\end{itemize}
+
+\section{Проверка установки}
+
+После установки проверьте:
+\begin{lstlisting}[language=bash,frame=single]
+# Поиск программы
+which text_analyzer
+
+# Проверка прав
+ls -l /usr/bin/text_analyzer
+
+# Проверка сертификата
+ls -l /etc/text_analyzer/install.conf
+\end{lstlisting}
+
+\section{Использование после установки}
+
+Запуск программы без указания пути:
+\begin{lstlisting}[language=bash,frame=single]
+text_analyzer -i
+\end{lstlisting}
+
+\section{Обновление программы}
+
+Для обновления на новую версию:
+\begin{lstlisting}[language=bash,frame=single]
+# Удаление старой версии
+sudo make uninstall
+
+# Установка новой
+make compile
+sudo make install
+\end{lstlisting}
+
+\section{Удаление программы}
+
+Полное удаление программы:
+\begin{lstlisting}[language=bash,frame=single]
+sudo make uninstall
+\end{lstlisting}
+
+При необходимости удалить также логи:
+\begin{lstlisting}[language=bash,frame=single]
+sudo rm -rf /var/log/text_analyzer
+\end{lstlisting}
+
+\section{Решение проблем}
+
+\subsection{Ошибка прав доступа}
+Если при установке возникает ошибка Permission denied, используйте \texttt{sudo}.
+
+\subsection{Ошибка компиляции}
+Убедитесь, что установлен GCC и все заголовочные файлы стандартной библиотеки.
+
+\subsection{Ошибка генерации PDF}
+Установите LaTeX (для macOS):
+\begin{lstlisting}[language=bash,frame=single]
+brew install --cask mactex-no-gui
+\end{lstlisting}
+
+\section{Состав пакета}
+
+После распаковки должна быть следующая структура:
+\begin{lstlisting}[frame=single]
+text_analyzer/
+├── Makefile
+├── LICENSE.txt
+├── LICENSE.tex
+├── install.conf (после configure)
+├── src/
+│   ├── main.c
+│   ├── core/
+│   │   ├── analyzer.h
+│   │   └── analyzer.c
+│   ├── ui/
+│   │   ├── interface.h
+│   │   └── interface.c
+│   └── utils/
+│       ├── logger.h
+│       └── logger.c
+├── docs/
+│   ├── AUTHOR
+│   ├── README
+│   ├── INSTALL
+│   └── *.tex
+└── scripts/
+    └── configure
+\end{lstlisting}
+
+\end{document}
